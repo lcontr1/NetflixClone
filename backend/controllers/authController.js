@@ -1,5 +1,6 @@
 import { User } from '../models/models.js';
 import bcryptjs from 'bcryptjs';
+import { generateTokenAndSetCookie } from '../utils/generateToken.js';
 
 export async function signup (req, res) {
     try {
@@ -48,17 +49,19 @@ export async function signup (req, res) {
             image
         });
 
-        await newUser.save();
-
-        res.status(201).json({ 
-            success:true, 
-            user:
-            {
-            ...newUser._doc,
-            password:""
-            },
         
-    })
+            generateTokenAndSetCookie(newUser._id, res);
+            await newUser.save();
+            res.status(201).json({ 
+                success:true, 
+                user:
+                {
+                ...newUser._doc,
+                password:""
+                },
+            
+        });       
+
 
     } catch (error) {
         console.log('Error during signup:', error.message);
